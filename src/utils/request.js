@@ -44,8 +44,7 @@ service.interceptors.response.use(
    */
   response => {
     const res = response.data
-
-    if (res.code !== 200) {
+    if (res.code !== 0) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -67,11 +66,11 @@ service.interceptors.response.use(
       }
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
-      return res
+      return res.response
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    console.log('err ' + error.Message) // for debug
     Message({
       message: error.message,
       type: 'error',
