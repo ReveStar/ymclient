@@ -1,11 +1,13 @@
 import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setAccount } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
   name: '',
   avatar: '',
+  account_id: '',
+  username: '',
   introduction: '',
   roles: []
 }
@@ -17,14 +19,20 @@ const mutations = {
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
   },
-  SET_NAME: (state, name) => {
-    state.name = name
-  },
+  // SET_NAME: (state, name) => {
+  //   state.name = name
+  // },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
   },
   SET_ROLES: (state, roles) => {
     state.roles = roles
+  },
+  SET_ACCOUNT_ID: (state, account_id) => {
+    state.account_id = account_id
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username
   }
 }
 
@@ -35,10 +43,11 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         commit('SET_TOKEN', response.token)
+        commit('SET_ACCOUNT_ID', response.account_id)
         setToken(response.token)
+        setAccount(response.account_id)
         resolve()
       }).catch(error => {
-        console.log('action: err', error)
         reject(error)
       })
     })
@@ -47,14 +56,13 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
+      getInfo(state.token, state.account_id).then(response => {
+        const data = response.accounts[0]
         if (!data) {
           reject('Verification failed, please Login again.')
         }
-
-        const { roles, name, avatar, introduction } = data
+        // const { roles, name, avatar, introduction } = data
+        const { roles, username, account_id } = data
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -62,9 +70,9 @@ const actions = {
         }
 
         commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
+        commit('SET_USERNAME', username)
+        // commit('SET_AVATAR', avatar)
+        commit('SET_ACCOUNT_ID', account_id)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -84,7 +92,6 @@ const actions = {
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
         dispatch('tagsView/delAllViews', null, { root: true })
-
         resolve()
       }).catch(error => {
         reject(error)

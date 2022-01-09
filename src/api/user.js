@@ -8,11 +8,14 @@ export function login(data) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo(token, account_id) {
   return request({
     url: '/user/info',
     method: 'get',
-    params: { token }
+    headers: { 'X-Token': token },
+    params: {
+      account_id
+    }
   })
 }
 
