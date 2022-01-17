@@ -25,3 +25,44 @@ export function logout() {
     method: 'post'
   })
 }
+
+export function getAll() {
+  return request({
+    url: '/account/all',
+    method: 'get'
+  })
+}
+
+export function updateAccount(data) {
+  return request(
+    {
+      url: '/account/update',
+      method: 'post',
+      data
+    }
+  )
+}
+
+export function createAccount(data) {
+  return request({
+    url: '/account/add',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAccount(data) {
+  return request({
+    url: 'account/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function searchAccount(data) {
+  return request({
+    url: 'user/info',
+    method: 'get',
+    params: data
+  })
+}
