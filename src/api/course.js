@@ -14,3 +14,29 @@ export function searchCourses(data) {
     params: data
   })
 }
+
+export function createCourse(data) {
+  return request({
+    url: '/course/add',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteCourse(data) {
+  return request({
+    url: '/course/delete',
+    method: 'post',
+    data
+  })
+}
+
+export function updateCourse(data) {
+  return request(
+    {
+      url: '/course/update',
+      method: 'post',
+      data
+    }
+  )
+}

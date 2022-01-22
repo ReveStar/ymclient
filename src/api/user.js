@@ -53,7 +53,7 @@ export function createAccount(data) {
 
 export function deleteAccount(data) {
   return request({
-    url: 'account/delete',
+    url: '/account/delete',
     method: 'post',
     data
   })
