@@ -22,14 +22,13 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="ID" prop="id" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="课程名" sortable="custom" align="center" width="100">
+      <el-table-column label="课程名" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.subject_id }}</span>
         </template>
@@ -57,7 +56,7 @@
       </el-table-column>
       <el-table-column label="结束时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.start_time }}</span>
+          <span>{{ row.end_time }}</span>
         </template>
       </el-table-column>
       <el-table-column label="状态" width="150px">
@@ -77,34 +76,34 @@
       </el-table-column>
     </el-table>
 
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handlePaginate" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="课程名" prop="subject_name">
-          <el-input v-model="temp.subject_name" />
+          <el-input v-model="temp.subject_id" />
         </el-form-item>
         <el-form-item label="学生" prop="student">
           <el-select v-model="temp.student" class="filter-item" placeholder="Please select">
             <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Date" prop="timestamp">
-          <el-date-picker v-model="temp.timestamp" type="datetime" placeholder="Please pick a date" />
+        <el-form-item label="教练" prop="teacher">
+          <el-input v-model="temp.teacher" />
         </el-form-item>
-        <el-form-item label="Title" prop="title">
-          <el-input v-model="temp.title" />
+        <el-form-item label="地点" prop="location">
+          <el-input v-model="temp.location" />
         </el-form-item>
-        <el-form-item label="Status">
+        <el-form-item label="开始时间" prop="start_time">
+          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Please pick a date" />
+        </el-form-item>
+        <el-form-item label="结束时间" prop="end_time">
+          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Please pick a date" />
+        </el-form-item>
+        <el-form-item v-if="dialogStatus!=='create'" label="状态">
           <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in statusOptions" :key="item" :label="item" :value="item" />
+            <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
           </el-select>
-        </el-form-item>
-        <el-form-item label="Imp">
-          <el-rate v-model="temp.importance" :colors="['#99A9BF', '#F7BA2A', '#FF9900']" :max="3" style="margin-top:8px;" />
-        </el-form-item>
-        <el-form-item label="Remark">
-          <el-input v-model="temp.remark" :autosize="{ minRows: 2, maxRows: 4}" type="textarea" placeholder="Please input" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -121,7 +120,7 @@
 
 <script>
 import { fetchPv, createArticle, updateArticle } from '@/api/article'
-import { fetchCourseList } from '@/api/course'
+import { fetchCourseList, searchCourses } from '@/api/course'
 import waves from '@/directive/waves' // waves directive
 import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
@@ -129,7 +128,7 @@ import Pagination from '@/components/Pagination' // secondary package based on e
 const courseStatusOptions = ['未开始', '进行中', '已完成', '已取消']
 
 export default {
-  name: 'ComplexTable',
+  name: 'Course',
   components: { Pagination },
   directives: { waves },
   filters: {
@@ -151,23 +150,18 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        importance: undefined,
-        title: undefined,
-        type: undefined,
-        sort: '+id'
+        student: 0,
+        teacher: 0,
+        status: ''
       },
-      importanceOptions: [1, 2, 3],
       courseStatusOptions,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
-      showReviewer: false,
       temp: {
         id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
+        subject_id: '',
+        student: '',
+        teacher: '',
+        start_time: new Date(),
+        end_time: new Date(),
         status: 'published'
       },
       dialogFormVisible: false,
@@ -176,14 +170,11 @@ export default {
         update: 'Edit',
         create: 'Create'
       },
-      dialogPvVisible: false,
-      pvData: [],
       rules: {
         type: [{ required: true, message: 'type is required', trigger: 'change' }],
         timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
         title: [{ required: true, message: 'title is required', trigger: 'blur' }]
-      },
-      downloadLoading: false
+      }
     }
   },
   created() {
@@ -204,26 +195,13 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
+    handlePaginate(data) {
+      this.listQuery.page = data.page
+      this.listQuery.limit = data.limit
+      searchCourses(this.listQuery).then((response) => {
+        const { accounts } = response
+        this.list = accounts
       })
-      row.status = status
-    },
-    sortChange(data) {
-      const { prop, order } = data
-      if (prop === 'id') {
-        this.sortByID(order)
-      }
-    },
-    sortByID(order) {
-      if (order === 'ascending') {
-        this.listQuery.sort = '+id'
-      } else {
-        this.listQuery.sort = '-id'
-      }
-      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
@@ -232,7 +210,7 @@ export default {
         remark: '',
         timestamp: new Date(),
         title: '',
-        status: 'published',
+        status: '',
         type: ''
       }
     },

@@ -6,3 +6,11 @@ export function fetchCourseList() {
     method: 'get'
   })
 }
+
+export function searchCourses(data) {
+  return request({
+    url: '/course/info',
+    method: 'get',
+    params: data
+  })
+}

@@ -22,14 +22,13 @@
       fit
       highlight-current-row
       style="width: 100%;"
-      @sort-change="sortChange"
     >
-      <el-table-column label="ID" prop="id" sortable="custom" align="center" width="80" :class-name="getSortClass('id')">
+      <el-table-column label="ID" prop="id" align="center" width="80">
         <template slot-scope="{row}">
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="账号ID" sortable="custom" align="center" width="100">
+      <el-table-column label="账号ID" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.account_id }}</span>
         </template>
