@@ -2,10 +2,6 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input v-model="listQuery.student" placeholder="学生" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-input v-model="listQuery.teacher" placeholder="教练" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-select v-model="listQuery.status" placeholder="课程状态" clearable class="filter-item" style="width: 130px">
-        <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
-      </el-select>
       <el-button v-waves class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">
         Search
       </el-button>
@@ -36,32 +32,36 @@
       <el-table-column label="学生" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.student }}</span>
-          <!-- <span>{{ row.create_at | parseTime('{y}-{m}-{d} {h}:{i}') }}</span> -->
         </template>
       </el-table-column>
-      <el-table-column label="教练" width="150px" align="center">
+      <el-table-column label="总课时" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.teacher }}</span>
+          <span>{{ row.course_all }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="地点" width="150px" align="center">
+      <el-table-column label="剩余课时" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.location }}</span>
+          <span>{{ row.course_left }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="开始时间" width="150px" align="center">
+      <el-table-column label="已用课时" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.start_time }}</span>
+          <span>{{ row.course_used }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="结束时间" width="150px" align="center">
+      <el-table-column label="赠送课时" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.end_time }}</span>
+          <span>{{ row.course_free }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="150px">
+      <el-table-column label="总费用" width="150px">
         <template slot-scope="{row}">
-          <span> {{ row.status }} </span>
+          <span> {{ row.charge_all }} </span>
+        </template>
+      </el-table-column>
+      <el-table-column label="已交费用" width="150px">
+        <template slot-scope="{row}">
+          <span> {{ row.charge_deli }} </span>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
@@ -84,26 +84,25 @@
           <el-input v-model="temp.subject_id" />
         </el-form-item>
         <el-form-item label="学生" prop="student">
-          <el-select v-model="temp.student" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+          <el-input v-model="temp.student" />
         </el-form-item>
-        <el-form-item label="教练" prop="teacher">
-          <el-input v-model="temp.teacher" />
+        <el-form-item label="总课时" prop="course_all">
+          <el-input v-model.number="temp.course_all" type="number" />
         </el-form-item>
-        <el-form-item label="地点" prop="location">
-          <el-input v-model="temp.location" />
+        <el-form-item label="剩余课时" prop="course_left">
+          <el-input v-model.number="temp.course_left" type="number" />
         </el-form-item>
-        <el-form-item label="开始时间" prop="start_time">
-          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Please pick a date" />
+        <el-form-item label="已用课时" prop="course_used">
+          <el-input v-model.number="temp.course_used" type="number" />
         </el-form-item>
-        <el-form-item label="结束时间" prop="end_time">
-          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Please pick a date" />
+        <el-form-item label="赠送课时" prop="course_free">
+          <el-input v-model.number="temp.course_free" type="number" />
         </el-form-item>
-        <el-form-item v-if="dialogStatus!=='create'" label="状态">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+        <el-form-item label="总费用" prop="charge_all">
+          <el-input v-model.number="temp.charge_all" type="number" />
+        </el-form-item>
+        <el-form-item label="已交费用" prop="charge_deli">
+          <el-input v-model.number="temp.charge_deli" type="number" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -119,11 +118,9 @@
 </template>
 
 <script>
-import { fetchCourseList, searchCourses, createCourse, deleteCourse, updateCourse } from '@/api/course'
+import { fetchStudentsList, updateStudent, createStudent, deleteStudent, searchStudent } from '@/api/student'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
-
-const courseStatusOptions = ['未开始', '进行中', '已完成', '已取消']
 
 export default {
   name: 'Student',
@@ -148,19 +145,18 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        student: 0,
-        teacher: 0,
-        status: ''
+        student: null
       },
-      courseStatusOptions,
       temp: {
         id: undefined,
         subject_id: '',
         student: '',
-        teacher: '',
-        start_time: new Date(),
-        end_time: new Date(),
-        status: 'published'
+        course_all: null,
+        course_left: null,
+        course_used: null,
+        course_free: null,
+        charge_all: null,
+        charge_deli: null
       },
       dialogFormVisible: false,
       dialogStatus: '',
@@ -169,9 +165,6 @@ export default {
         create: 'Create'
       },
       rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       }
     }
   },
@@ -181,35 +174,33 @@ export default {
   methods: {
     getList() {
       this.listLoading = true
-      fetchCourseList().then(response => {
+      fetchStudentsList().then(response => {
         console.log(response)
-        const { courses } = response
-        this.list = courses
-        this.total = courses.length
+        const { students } = response
+        this.list = students
+        this.total = students.length
         this.listLoading = false
       })
     },
     handleFilter() {
       this.listQuery.page = 1
-      this.getList()
+      searchStudent(this.listQuery).then((response) => {
+        const { students } = response
+        this.total = students.length
+        this.list = students
+      })
     },
     handlePaginate(data) {
       this.listQuery.page = data.page
       this.listQuery.limit = data.limit
-      searchCourses(this.listQuery).then((response) => {
-        const { accounts } = response
-        this.list = accounts
+      searchStudent(this.listQuery).then((response) => {
+        const { students } = response
+        this.list = students
       })
     },
     resetTemp() {
       this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: '',
-        type: ''
+        id: undefined
       }
     },
     handleCreate() {
@@ -223,8 +214,7 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.roles = [this.temp.role]
-          createCourse(this.temp).then(() => {
+          createStudent(this.temp).then(() => {
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -249,7 +239,7 @@ export default {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
           const tempData = Object.assign({}, this.temp)
-          updateCourse(tempData).then(() => {
+          updateStudent(tempData).then(() => {
             this.dialogFormVisible = false
             this.$notify({
               title: 'Success',
@@ -264,7 +254,7 @@ export default {
     },
     handleDelete(row, index) {
       const tempData = Object.assign({}, row)
-      deleteCourse(tempData).then(() => {
+      deleteStudent(tempData).then(() => {
         this.$notify({
           title: 'Success',
           message: 'Delete Successfully',

@@ -79,14 +79,15 @@
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handlePaginate" />
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
+      <el-form ref="dataForm" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
         <el-form-item label="课程名" prop="subject_name">
           <el-input v-model="temp.subject_id" />
         </el-form-item>
         <el-form-item label="学生" prop="student">
-          <el-select v-model="temp.student" class="filter-item" placeholder="Please select">
+          <el-input v-model="temp.student" />
+          <!-- <el-select v-model="temp.student" class="filter-item" placeholder="Please select">
             <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
+          </el-select> -->
         </el-form-item>
         <el-form-item label="教练" prop="teacher">
           <el-input v-model="temp.teacher" />
@@ -148,8 +149,8 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
-        student: 0,
-        teacher: 0,
+        student: null,
+        teacher: null,
         status: ''
       },
       courseStatusOptions,
@@ -167,11 +168,6 @@ export default {
       textMap: {
         update: 'Edit',
         create: 'Create'
-      },
-      rules: {
-        type: [{ required: true, message: 'type is required', trigger: 'change' }],
-        timestamp: [{ type: 'date', required: true, message: 'timestamp is required', trigger: 'change' }],
-        title: [{ required: true, message: 'title is required', trigger: 'blur' }]
       }
     }
   },
@@ -191,14 +187,18 @@ export default {
     },
     handleFilter() {
       this.listQuery.page = 1
-      this.getList()
+      searchCourses(this.listQuery).then((response) => {
+        const { courses } = response
+        this.total = courses.length
+        this.list = courses
+      })
     },
     handlePaginate(data) {
       this.listQuery.page = data.page
       this.listQuery.limit = data.limit
       searchCourses(this.listQuery).then((response) => {
-        const { accounts } = response
-        this.list = accounts
+        const { courses } = response
+        this.list = courses
       })
     },
     resetTemp() {
@@ -223,7 +223,8 @@ export default {
     createData() {
       this.$refs['dataForm'].validate((valid) => {
         if (valid) {
-          this.temp.roles = [this.temp.role]
+          this.temp.start_time = new Date(this.temp.start_time).getTime()
+          this.temp.end_time = new Date(this.temp.end_time).getTime()
           createCourse(this.temp).then(() => {
             this.dialogFormVisible = false
             this.$notify({
