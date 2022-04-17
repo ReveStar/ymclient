@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 
 const TokenKey = 'Admin-Token'
 const AccountKey = 'Admin-Account'
+const OpenIdKey = 'Client-OpenId'
 
 export function getToken() {
   return Cookies.get(TokenKey)
@@ -21,4 +22,12 @@ export function setAccount(account_id) {
 
 export function getAccount() {
   return Cookies.get(AccountKey)
+}
+
+export function setOpenId(open_id) {
+  return Cookies.set(OpenIdKey, open_id)
+}
+
+export function getOpenId() {
+  return Cookies.get(OpenIdKey)
 }

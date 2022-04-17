@@ -1,5 +1,7 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken, setAccount } from '@/utils/auth'
+import { login, logout, getInfo, wxbind } from '@/api/user'
+import { getInfoByCode } from '@/api/util'
+
+import { getToken, setToken, removeToken, setAccount, setOpenId } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
@@ -9,7 +11,8 @@ const state = {
   account_id: '',
   username: '',
   introduction: '',
-  roles: []
+  roles: [],
+  open_id: ''
 }
 
 const mutations = {
@@ -33,6 +36,9 @@ const mutations = {
   },
   SET_USERNAME: (state, username) => {
     state.username = username
+  },
+  SET_OPENID: (state, open_id) => {
+    state.open_id = open_id
   }
 }
 
@@ -53,6 +59,21 @@ const actions = {
     })
   },
 
+  wxbind({ commit }, userInfo) {
+    const { username, password, open_id } = userInfo
+    return new Promise((resolve, reject) => {
+      wxbind({ username: username.trim(), password: password, open_id: open_id }).then(response => {
+        commit('SET_TOKEN', response.token)
+        commit('SET_ACCOUNT_ID', response.account_id)
+        setToken(response.token)
+        setAccount(response.account_id)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
@@ -61,7 +82,6 @@ const actions = {
         if (!data) {
           reject('Verification failed, please Login again.')
         }
-        // const { roles, name, avatar, introduction } = data
         const { roles, username, account_id } = data
 
         // roles must be a non-empty array
@@ -74,6 +94,34 @@ const actions = {
         // commit('SET_AVATAR', avatar)
         commit('SET_ACCOUNT_ID', account_id)
         resolve(data)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  getInfoByCode({ commit }, code) {
+    return new Promise((resolve, reject) => {
+      getInfoByCode(code).then(response => {
+        const needBind = response.need_bind
+        if (needBind) {
+          const open_id = response.open_id
+          commit('SET_OPENID', open_id)
+          setOpenId(open_id)
+          resolve(response)
+        } else {
+          const { roles, username, account_id } = response.account_info
+          const open_id = response.open_id
+          commit('SET_ROLES', roles)
+          commit('SET_USERNAME', username)
+          commit('SET_ACCOUNT_ID', account_id)
+          commit('SET_OPENID', open_id)
+          commit('SET_TOKEN', response.token)
+          setToken(response.token)
+          setAccount(account_id)
+          setOpenId(open_id)
+          resolve(response)
+        }
       }).catch(error => {
         reject(error)
       })

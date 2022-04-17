@@ -1,9 +1,10 @@
 import request from '@/utils/request'
 
-export function fetchCourseList() {
+export function fetchCourseList(data) {
   return request({
     url: '/course/all',
-    method: 'get'
+    method: 'get',
+    params: data
   })
 }
 

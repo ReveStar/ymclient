@@ -8,6 +8,15 @@ export function login(data) {
   })
 }
 
+export function wxbind(data) {
+  return request({
+    url: '/wx/user/bind',
+    method: 'post',
+    data,
+    baseURL: 'api/client'
+  })
+}
+
 export function getInfo(token, account_id) {
   return request({
     url: '/user/info',

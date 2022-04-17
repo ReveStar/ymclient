@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'admin',
+  title: 'rclient',
 
   /**
    * @type {boolean} true | false
