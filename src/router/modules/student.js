@@ -4,6 +4,7 @@ const studentRouter = {
   path: '/student',
   component: Layout,
   redirect: '/student/index',
+  meta: { roles: ['student'] },
   children: [
     {
       path: 'index',

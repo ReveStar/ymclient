@@ -1,12 +1,12 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <el-form ref="bindForm" :model="bindForm" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
         <h3 class="title">绑定帐号</h3>
       </div>
 
-      <el-form-item prop="username">
+      <!-- <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
@@ -43,50 +43,67 @@
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
         </el-form-item>
-      </el-tooltip>
-
+      </el-tooltip> -->
+      <el-form-item prop="phone">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="phone"
+          v-model="bindForm.phone"
+          type="text"
+          placeholder="请输入手机号"
+          name="phone"
+          autocomplete="on"
+        />
+        <span class="show-pwd">
+          <el-button type="primary" @click="getValidCode">获取验证码</el-button>
+        </span>
+      </el-form-item>
+      <el-form-item prop="code">
+        <span class="svg-container">
+          <svg-icon icon-class="lock" />
+        </span>
+        <el-input
+          ref="code"
+          v-model="bindForm.code"
+          placeholder="输入验证码"
+          name="code"
+          type="text"
+          tabindex="1"
+        />
+      </el-form-item>
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleBind">提交</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+// import { validUsername } from '@/utils/validate'
+import { sendPhoneCode } from '@/api/account'
+import { Message } from 'element-ui'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
-      loginForm: {
-        username: '',
-        password: ''
+      bindForm: {
+        // username: '',
+        // password: '',
+        phone: '',
+        code: '',
+        type: 2
       },
-      loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
-      },
-      passwordType: 'password',
-      capsTooltip: false,
+      // passwordType: 'password',
+      // capsTooltip: false,
       loading: false,
       redirect: undefined,
       otherQuery: {},
       temp: {
         username: '',
         password: '',
+        phone: '',
+        code: '',
         open_id: ''
       }
     }
@@ -106,34 +123,32 @@ export default {
   created() {
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
+    if (this.bindForm.phone === '') {
+      this.$refs.phone.focus()
     }
   },
   destroyed() {
   },
   methods: {
-    checkCapslock(e) {
-      const { key } = e
-      this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
-    },
-    showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
-      } else {
-        this.passwordType = 'password'
-      }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
-    },
+    // checkCapslock(e) {
+    //   const { key } = e
+    //   this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
+    // // },
+    // showPwd() {
+    //   if (this.passwordType === 'password') {
+    //     this.passwordType = ''
+    //   } else {
+    //     this.passwordType = 'password'
+    //   }
+    //   this.$nextTick(() => {
+    //     this.$refs.password.focus()
+    //   })
+    // },
     handleBind() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.temp = Object.assign({}, this.loginForm)
+          this.temp = Object.assign({}, this.bindForm)
           this.temp.open_id = this.$route.query.name
           this.$store.dispatch('user/wxbind', this.temp)
             .then(() => {
@@ -156,6 +171,18 @@ export default {
         }
         return acc
       }, {})
+    },
+    getValidCode() {
+      sendPhoneCode(this.bindForm).then((response) => {
+        const { success } = response
+        if (success === true) {
+          Message({
+            message: '验证码已发送',
+            type: 'info',
+            duration: 5 * 1000
+          })
+        }
+      })
     }
   }
 }

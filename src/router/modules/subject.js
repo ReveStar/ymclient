@@ -4,6 +4,7 @@ const subjectRouter = {
   path: '/subject',
   component: Layout,
   redirect: '/subject/index',
+  meta: { roles: ['student'] },
   children: [
     {
       path: 'index',

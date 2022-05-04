@@ -75,3 +75,10 @@ export function searchAccount(data) {
     params: data
   })
 }
+
+export function getTeachers() {
+  return request({
+    url: 'account/teachers',
+    method: 'get'
+  })
+}
