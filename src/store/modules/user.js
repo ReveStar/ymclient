@@ -1,5 +1,6 @@
 import { login, logout, getInfo, wxbind } from '@/api/user'
 import { getInfoByCode } from '@/api/util'
+import { registerAccount } from '@/api/account'
 
 import { getToken, setToken, removeToken, setAccount, setOpenId } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
@@ -45,9 +46,23 @@ const mutations = {
 const actions = {
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { username, password, code, phone } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: password, code: code, phone: phone }).then(response => {
+        commit('SET_TOKEN', response.token)
+        commit('SET_ACCOUNT_ID', response.account_id)
+        setToken(response.token)
+        setAccount(response.account_id)
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
+  register({ commit }, userInfo) {
+    return new Promise((resolve, reject) => {
+      registerAccount(userInfo).then(response => {
         commit('SET_TOKEN', response.token)
         commit('SET_ACCOUNT_ID', response.account_id)
         setToken(response.token)
@@ -137,8 +152,6 @@ const actions = {
         removeToken()
         resetRouter()
 
-        // reset visited views and cached views
-        // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
         dispatch('tagsView/delAllViews', null, { root: true })
         resolve()
       }).catch(error => {

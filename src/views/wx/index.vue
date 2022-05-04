@@ -4,7 +4,7 @@ import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
-      AppId: 'wxd9f1d7d25401aabc',
+      AppId: 'wx73d2dbd39ff54f88',
       code: ''
     }
   },

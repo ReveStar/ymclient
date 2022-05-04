@@ -1,92 +1,91 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">登录</h3>
+        <h3 class="title">注册</h3>
       </div>
 
-      <el-form-item v-if="use_phone==false" prop="username">
+      <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.username"
-          placeholder="请输入用户名"
+          v-model="registerForm.username"
+          placeholder="输入用户名"
           name="username"
           type="text"
           tabindex="1"
-          autocomplete="on"
         />
       </el-form-item>
 
-      <el-tooltip v-if="use_phone==false" v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
-        <el-form-item prop="password">
-          <span class="svg-container">
-            <svg-icon icon-class="password" />
-          </span>
-          <el-input
-            :key="passwordType"
-            ref="password"
-            v-model="loginForm.password"
-            :type="passwordType"
-            placeholder="请输入密码"
-            name="password"
-            tabindex="2"
-            autocomplete="on"
-            @keyup.native="checkCapslock"
-            @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
-          />
-          <span class="show-pwd" @click="showPwd">
-            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-          </span>
-        </el-form-item>
-      </el-tooltip>
+      <el-form-item prop="password">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          :key="passwordType"
+          ref="password"
+          v-model="registerForm.password"
+          :type="passwordType"
+          placeholder="输入密码"
+          name="password"
+          tabindex="2"
+          @keyup.native="checkCapslock"
+        />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
 
-      <el-form-item v-if="use_phone==true" prop="phone">
+      <el-form-item prop="confirm_password">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          :key="passwordConfirmType"
+          ref="confirm_password"
+          v-model="registerForm.confirm_password"
+          :type="passwordConfirmType"
+          placeholder="再次输入密码"
+          name="confirm_password"
+          tabindex="2"
+        />
+        <span class="show-pwd" @click="showConfirmPwd">
+          <svg-icon :icon-class="passwordConfirmType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+      <el-form-item prop="phone">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="phone"
-          v-model="loginForm.phone"
+          v-model="registerForm.phone"
+          type="text"
           placeholder="请输入手机号"
           name="phone"
-          type="text"
-          tabindex="1"
           autocomplete="on"
         />
         <span class="show-pwd">
           <el-button type="primary" @click="getValidCode">获取验证码</el-button>
         </span>
       </el-form-item>
-
-      <el-form-item v-if="use_phone==true" prop="code">
+      <el-form-item prop="code">
         <span class="svg-container">
-          <svg-icon icon-class="user" />
+          <svg-icon icon-class="lock" />
         </span>
         <el-input
           ref="code"
-          v-model="loginForm.code"
-          placeholder="请输入验证码"
+          v-model="registerForm.code"
+          placeholder="输入验证码"
           name="code"
           type="text"
           tabindex="1"
-          autocomplete="on"
         />
       </el-form-item>
-
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:10px;" @click.native.prevent="handleLogin">登录</el-button>
-
-      <el-button v-if="use_phone==false" type="primary" style="width:100%;margin-left:0px;" @click="use_phone=true">
-        使用手机号登录
-      </el-button>
-      <el-button v-if="use_phone==true" type="primary" style="width:100%;margin-left:0px;" @click="use_phone=false">
-        使用用户名登录
-      </el-button>
-
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>
     </el-form>
   </div>
 </template>
@@ -97,40 +96,50 @@ import { sendPhoneCode } from '@/api/account'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'Login',
+  name: 'Register',
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('用户名不可用'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('密码过短'))
       } else {
         callback()
       }
     }
+    const validateConfirmPassword = (rule, value, callback) => {
+      if (value !== this.registerForm.password) {
+        callback(new Error('密码不一致'))
+      } else {
+        callback()
+      }
+    }
+
     return {
-      loginForm: {
+      registerForm: {
         username: '',
         password: '',
+        confirm_password: '',
         phone: '',
-        code: '',
-        type: 1
+        code: ''
       },
-      loginRules: {
+      registerRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        confirm_password: [{ required: true, trigger: 'blur', validator: validateConfirmPassword }]
       },
       passwordType: 'password',
+      passwordConfirmType: 'password',
       capsTooltip: false,
       loading: false,
+      showDialog: false,
       redirect: undefined,
-      otherQuery: {},
-      use_phone: false
+      otherQuery: {}
     }
   },
   watch: {
@@ -149,9 +158,9 @@ export default {
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
+    if (this.registerForm.username === '') {
       this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
+    } else if (this.registerForm.password === '') {
       this.$refs.password.focus()
     }
   },
@@ -169,15 +178,19 @@ export default {
       } else {
         this.passwordType = 'password'
       }
-      this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
     },
-    handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+    showConfirmPwd() {
+      if (this.passwordConfirmType === 'password') {
+        this.passwordConfirmType = ''
+      } else {
+        this.passwordConfirmType = 'password'
+      }
+    },
+    handleRegister() {
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
+          this.$store.dispatch('user/register', this.registerForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
@@ -186,7 +199,7 @@ export default {
               this.loading = false
             })
         } else {
-          console.log('error submit!!')
+          console.log('error register!!')
           return false
         }
       })
@@ -200,7 +213,7 @@ export default {
       }, {})
     },
     getValidCode() {
-      sendPhoneCode(this.loginForm).then((response) => {
+      sendPhoneCode(this.registerForm).then((response) => {
         const { success } = response
         if (success === true) {
           Message({
@@ -209,9 +222,7 @@ export default {
             duration: 5 * 1000
           })
         }
-      }).catch(
-        () => {}
-      )
+      })
     }
   }
 }

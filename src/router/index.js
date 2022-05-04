@@ -8,7 +8,7 @@ import Layout from '@/layout'
 
 /* Router Modules */
 // import accountRouter from './modules/account'
-// import studentRouter from './modules/student'
+import studentRouter from './modules/student'
 // import courseRouter from './modules/course'
 import subjectRouter from './modules/subject'
 
@@ -27,6 +27,11 @@ export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
+    hidden: true
+  },
+  {
+    path: '/register',
+    component: () => import('@/views/register/index'),
     hidden: true
   },
   {
@@ -53,7 +58,7 @@ export const constantRoutes = [
         path: 'home',
         component: () => import('@/views/home/index'),
         name: 'home',
-        meta: { title: '首页', icon: 'dashboard', affix: true }
+        meta: { title: '课表', icon: 'dashboard', affix: true }
       }
     ]
   },
@@ -77,7 +82,7 @@ export const constantRoutes = [
 export const asyncRoutes = [
 
   // accountRouter,
-  // studentRouter,
+  studentRouter,
   // courseRouter,
   subjectRouter,
 

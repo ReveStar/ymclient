@@ -20,12 +20,12 @@
       highlight-current-row
       style="width: 100%;"
     >
-      <el-table-column label="ID" prop="id" align="center" width="80">
+      <el-table-column label="课程名" align="center" width="100">
         <template slot-scope="{row}">
-          <span>{{ row.id }}</span>
+          <span>{{ row.subject }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="课程名" align="center" width="100">
+      <el-table-column label="课程ID" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.subject_id }}</span>
         </template>
@@ -141,7 +141,6 @@ export default {
     },
     getList() {
       this.listLoading = true
-      this.setQuery(this.account_id)
       fetchCourseList(this.listQuery).then(response => {
         console.log(response)
         const { courses } = response
@@ -165,14 +164,6 @@ export default {
         const { courses } = response
         this.list = courses
       })
-    },
-    setQuery(accountId) {
-      const roles = this.roles
-      if (roles.includes('student')) {
-        this.listQuery.student = accountId
-      } else if (roles.includes('teacher')) {
-        this.listQuery.teacher = accountId
-      }
     },
     resetTemp() {
       this.temp = {

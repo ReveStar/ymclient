@@ -15,3 +15,10 @@ export function searchSubjects(data) {
   })
 }
 
+export function orderSubject(data) {
+  return request({
+    url: 'subject/order',
+    method: 'post',
+    data
+  })
+}
