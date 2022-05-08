@@ -75,9 +75,9 @@ const actions = {
   },
 
   wxbind({ commit }, userInfo) {
-    const { username, password, open_id } = userInfo
+    const { phone, code, open_id } = userInfo
     return new Promise((resolve, reject) => {
-      wxbind({ username: username.trim(), password: password, open_id: open_id }).then(response => {
+      wxbind({ phone: phone.trim(), code: code, open_id: open_id }).then(response => {
         commit('SET_TOKEN', response.token)
         commit('SET_ACCOUNT_ID', response.account_id)
         setToken(response.token)
@@ -125,9 +125,8 @@ const actions = {
           setOpenId(open_id)
           resolve(response)
         } else {
-          const { roles, username, account_id } = response.account_info
+          const { username, account_id } = response.account_info
           const open_id = response.open_id
-          commit('SET_ROLES', roles)
           commit('SET_USERNAME', username)
           commit('SET_ACCOUNT_ID', account_id)
           commit('SET_OPENID', open_id)

@@ -40,9 +40,9 @@ export default {
         const needBind = response.need_bind
         if (needBind) {
           const uri = '/bindwx?name=' + response.open_id
-          this.$router.push({ path: uri, replace: true })
+          this.$router.push({ path: uri })
         } else {
-          this.$router.push({ path: '/home', replace: true })
+          this.$router.push({ path: '/' })
         }
       }).catch(() => {
         this.$router.push({ path: '/login' })

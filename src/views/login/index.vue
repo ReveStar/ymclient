@@ -143,6 +143,17 @@ export default {
         }
       },
       immediate: true
+    },
+    use_phone: {
+      handler: function(newVal, oldVal) {
+        if (newVal === true && oldVal === false) {
+          this.loginForm.username = ''
+          this.loginForm.password = ''
+        } else if (newVal === false && oldVal === true) {
+          this.loginForm.phone = ''
+          this.loginForm.code = ''
+        }
+      }
     }
   },
   created() {

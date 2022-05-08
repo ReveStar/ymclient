@@ -88,14 +88,10 @@ export default {
   data() {
     return {
       bindForm: {
-        // username: '',
-        // password: '',
         phone: '',
         code: '',
         type: 2
       },
-      // passwordType: 'password',
-      // capsTooltip: false,
       loading: false,
       redirect: undefined,
       otherQuery: {},
@@ -130,22 +126,8 @@ export default {
   destroyed() {
   },
   methods: {
-    // checkCapslock(e) {
-    //   const { key } = e
-    //   this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
-    // // },
-    // showPwd() {
-    //   if (this.passwordType === 'password') {
-    //     this.passwordType = ''
-    //   } else {
-    //     this.passwordType = 'password'
-    //   }
-    //   this.$nextTick(() => {
-    //     this.$refs.password.focus()
-    //   })
-    // },
     handleBind() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.bindForm.validate(valid => {
         if (valid) {
           this.loading = true
           this.temp = Object.assign({}, this.bindForm)
