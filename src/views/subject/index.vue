@@ -34,6 +34,12 @@
           <span>{{ row.price }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="优惠价格" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.discount_price }}</span>
+        </template>
+      </el-table-column>
+
       <el-table-column label="课时数" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.school_hour }}</span>
@@ -65,6 +71,9 @@
         </el-form-item>
         <el-form-item label="学费" prop="price">
           <el-input v-model="temp.price" :disabled="true" />
+        </el-form-item>
+        <el-form-item label="优惠价格" prop="discount_price">
+          <el-input v-model="temp.discount_price" :disabled="true" />
         </el-form-item>
         <el-form-item label="课时数" prop="school_hour">
           <el-input-number v-model="temp.school_hour" :disabled="true" />
@@ -121,6 +130,7 @@ export default {
         name: '',
         subject_id: '',
         price: null,
+        discount_price: '',
         school_hour: null,
         describ: ''
       },

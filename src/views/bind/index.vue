@@ -3,7 +3,7 @@
     <el-form ref="bindForm" :model="bindForm" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">绑定帐号</h3>
+        <h3 class="title">登陆</h3>
       </div>
 
       <!-- <el-form-item prop="username">
@@ -73,7 +73,8 @@
           tabindex="1"
         />
       </el-form-item>
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleBind">提交</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:10px;" @click.native.prevent="handleBind">提交</el-button>
+      <div style="color: grey;font-size: 0.8em"> 若未注册，则默认以该帐号注册 </div>
     </el-form>
   </div>
 </template>

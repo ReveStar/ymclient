@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'rclient',
+  title: 'link运动时空',
 
   /**
    * @type {boolean} true | false
