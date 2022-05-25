@@ -47,66 +47,24 @@
       </el-table-column>
       <el-table-column label="开始时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.start_time }}</span>
+          <!-- <span>{{ row.start_time }}</span> -->
+          <span>{{ row.start_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
       <el-table-column label="结束时间" width="150px" align="center">
         <template slot-scope="{row}">
-          <span>{{ row.end_time }}</span>
+          <!-- <span>{{ row.end_time }}</span> -->
+          <span>{{ row.start_time | parseTime('{y}-{m}-{d} {h}:{i}') }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="150px">
+      <el-table-column label="状态" min-width="150px">
         <template slot-scope="{row}">
           <span> {{ row.status }} </span>
-        </template>
-      </el-table-column>
-      <el-table-column v-if="role==='teacher'" label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row, $index)">
-            编辑
-          </el-button>
         </template>
       </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handlePaginate" />
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
-      <el-form ref="dataForm" :model="temp" label-position="left" label-width="70px" style="width: 400px; margin-left:50px;">
-        <el-form-item label="课程名" prop="subject">
-          <el-input v-model="temp.subject" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="学生" prop="student">
-          <el-input v-model="temp.student" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="教练" prop="teacher">
-          <el-select v-model="temp.teacher_id" placeholder="选择教师" @change="handleSelectTeacher(temp.teacher_id)">
-            <el-option v-for="item in teacherList" :key="item.account_id" :label="item.username" :value="item.account_id" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="地点" prop="location">
-          <el-input v-model="temp.location" :disabled="true" />
-        </el-form-item>
-        <el-form-item label="开始时间" prop="start_time">
-          <el-date-picker v-model="temp.start_time" type="datetime" placeholder="Please pick a date" />
-        </el-form-item>
-        <el-form-item label="结束时间" prop="end_time">
-          <el-date-picker v-model="temp.end_time" type="datetime" placeholder="Please pick a date" />
-        </el-form-item>
-        <el-form-item label="状态">
-          <el-select v-model="temp.status" class="filter-item" placeholder="Please select">
-            <el-option v-for="item in courseStatusOptions" :key="item" :label="item" :value="item" />
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">
-          取消
-        </el-button>
-        <el-button type="primary" @click="dialogStatus==='create'?createData():updateData()">
-          确认
-        </el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 

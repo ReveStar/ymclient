@@ -37,14 +37,14 @@
           <span>{{ row.name }}</span>
         </template>
       </el-table-column>
-      <!-- <el-table-column label="课程ID" align="center" width="100">
-        <template slot-scope="{row}">
-          <span>{{ row.subject_id }}</span>
-        </template>
-      </el-table-column> -->
       <el-table-column label="学费" width="150px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.price }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="优惠价格" width="150px" align="center">
+        <template slot-scope="{row}">
+          <span>{{ row.discount_price }}</span>
         </template>
       </el-table-column>
       <el-table-column label="课时数" width="150px" align="center">
@@ -55,6 +55,13 @@
       <el-table-column label="描述" min-width="300px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.describ }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
+        <template slot-scope="{row,$index}">
+          <el-button size="mini" type="primary" @click="handleClick(row,$index)">
+            报名
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -125,6 +132,9 @@ export default {
         const { subjects } = response
         this.list = subjects
       })
+    },
+    handleClick(row, index) {
+      this.$router.push({ path: '/index' })
     }
   }
 }

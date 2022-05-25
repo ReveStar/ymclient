@@ -10,7 +10,7 @@ const studentRouter = {
       path: 'index',
       component: () => import('@/views/student/index'),
       name: 'student',
-      meta: { title: '个人信息', icon: 'table', affix: true }
+      meta: { title: '课程信息', icon: 'table', affix: true }
     }
   ]
 }

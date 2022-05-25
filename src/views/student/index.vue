@@ -56,7 +56,7 @@
           <span> {{ row.charge_deli }} </span>
         </template>
       </el-table-column>
-      <el-table-column label="状态" width="150px">
+      <el-table-column label="状态" min-width="150px">
         <template slot-scope="{row}">
           <span> {{ row.status }} </span>
         </template>
