@@ -19,6 +19,13 @@
       highlight-current-row
       style="width: 100%;"
     >
+      <el-table-column label="操作" align="center" min-width="100" class-name="small-padding fixed-width">
+        <template slot-scope="{row,$index}">
+          <el-button size="mini" type="primary" @click="handleClick(row,$index)">
+            报名
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="课程名" align="center" width="100">
         <template slot-scope="{row}">
           <span>{{ row.name }}</span>
@@ -29,12 +36,12 @@
           <span>{{ row.subject_id }}</span>
         </template>
       </el-table-column> -->
-      <el-table-column label="学费" width="150px" align="center">
+      <el-table-column label="课程价格" width="60px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.price }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="优惠价格" width="150px" align="center">
+      <el-table-column label="团购价格" width="60px" align="center">
         <template slot-scope="{row}">
           <span>{{ row.discount_price }}</span>
         </template>
@@ -50,13 +57,7 @@
           <span>{{ row.describ }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center" min-width="230" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
-          <el-button size="mini" type="primary" @click="handleClick(row,$index)">
-            报名
-          </el-button>
-        </template>
-      </el-table-column>
+
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="handlePaginate" />
@@ -69,10 +70,10 @@
         <el-form-item label="课程ID" prop="subject_id">
           <el-input v-model="temp.subject_id" :disabled="true" />
         </el-form-item>
-        <el-form-item label="学费" prop="price">
+        <el-form-item label="课程价格" prop="price">
           <el-input v-model="temp.price" :disabled="true" />
         </el-form-item>
-        <el-form-item label="优惠价格" prop="discount_price">
+        <el-form-item label="团购价格" prop="discount_price">
           <el-input v-model="temp.discount_price" :disabled="true" />
         </el-form-item>
         <el-form-item label="课时数" prop="school_hour">
